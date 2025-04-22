@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Treinamento.Application\Treinamento.Application.csproj" />
+    <ProjectReference Include="..\Treinamento.Data\Treinamento.Data.csproj" />
+    <ProjectReference Include="..\Treinamento.Domain\Treinamento.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
