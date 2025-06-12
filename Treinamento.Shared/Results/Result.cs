@@ -2,9 +2,9 @@
 using Treinamento.Domain.Interfaces;
 using Treinamento.Domain.ValueObjects;
 
-namespace Treinamento.Domain;
+namespace Treinamento.Shared.Results;
 
-public class Result<T>
+public class ResultData<T>
 {
     public int Code { get; set; }
     public string? Message { get; set; }

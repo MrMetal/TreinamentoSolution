@@ -2,6 +2,7 @@
 using Treinamento.Application.Interfaces;
 using Treinamento.Domain;
 using Treinamento.Domain.Interfaces;
+using Treinamento.Shared.Results;
 
 namespace Treinamento.Api.Controllers;
 

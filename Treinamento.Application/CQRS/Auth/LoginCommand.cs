@@ -1,10 +1,7 @@
 ﻿using Treinamento.Application.Interfaces;
-using Treinamento.Domain;
+using Treinamento.Shared.Results;
+using Treinamento.Shared.ViewModels;
 
 namespace Treinamento.Application.CQRS.Auth;
 
-public class LoginCommand : IRequest<ResultData>
-{
-    public required string Email { get; set; }
-    public required string Password { get; set; }
-}
+public class LoginCommand : LoginViewModel, IRequest<ResultData>;

@@ -1,0 +1,30 @@
+﻿@using Treinamento.BlazorServerApp.Components.Layout
+@using Treinamento.BlazorServerApp.Components.Pages.Componentes
+@using Treinamento.BlazorServerApp.Components.Pages.Auth
+
+<CascadingAuthenticationState>
+
+    <Router AppAssembly="typeof(Program).Assembly">
+
+        <Found Context="routeData">
+            
+            <CascadingValue Value="this">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                    <Authorizing>
+                        <Loading/>
+                    </Authorizing>
+
+                    <NotAuthorized>
+                        <NaoAutorizado/>
+                    </NotAuthorized>
+                </AuthorizeRouteView>
+            </CascadingValue>
+        </Found>
+
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <NaoEncontrado />
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

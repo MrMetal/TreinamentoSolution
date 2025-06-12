@@ -1,0 +1,62 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.Authorization
+@using Newtonsoft.Json
+@using Treinamento.BlazorServerApp.Data.ApiEndpoints
+@using Treinamento.Shared.ViewModels
+
+@attribute [AllowAnonymous]
+@inject IApiEndpoints<LoginViewModel> ApiService
+
+
+<div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="card shadow p-4" style="width: 100%; max-width: 400px;">
+        <h4 class="card-title text-center mb-4">Entrar</h4>
+
+        <EditForm Model="@_loginModel" FormName="LoginForm" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group mb-3">
+                <label for="email">Email</label>
+                <InputText @bind-Value="_loginModel.Email" id="email" class="form-control" type="email" />
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="senha">Senha</label>
+                <InputText @bind-Value="_loginModel.Password" id="senha" class="form-control" type="password" />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        </EditForm>
+        
+        @if (_errorMessage is not null)
+        {
+            <p>@_errorMessage</p>
+        }
+    </div>
+</div>
+
+
+@code {
+    private LoginViewModel _loginModel = new();
+    private string? _errorMessage;
+    
+    private async Task HandleValidSubmit()
+    {
+        var result  = await ApiService.PostAsync("Auth/login", _loginModel);
+
+        if (result.Success)
+        {
+            var tokenResponse = JsonConvert.DeserializeObject<LoginResponseViewModel>(result.Data!.ToString()!);
+            await LocalStorageService.SetItemAsync("est.token", tokenResponse!.AccessToken);
+        
+            NavigationManager.NavigateTo($"/Auth/SignIn?token={Uri.EscapeDataString(tokenResponse!.AccessToken)}", true);
+
+            StateHasChanged();
+        }
+        else
+        {
+            _errorMessage = result.Errors.First();
+        }
+    }
+}

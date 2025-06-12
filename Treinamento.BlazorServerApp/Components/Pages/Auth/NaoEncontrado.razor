@@ -1,0 +1,16 @@
+﻿@page "/404"
+<br />
+<h1>404</h1>
+<p>Desculpe, A pagina que está tentando acessar não existe.</p>
+<br />
+
+<small>Caso persista o erro entre em contato com o suporte.</small>
+<br />
+
+<button @onclick="GoToHome">
+    Voltar para a pagina inicial
+</button>
+
+@code {
+    private void GoToHome() => NavigationManager.NavigateTo("/");
+}

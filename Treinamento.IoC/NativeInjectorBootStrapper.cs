@@ -10,8 +10,8 @@ using Treinamento.Data.Identity.Jwt;
 using Treinamento.Data.Interfaces;
 using Treinamento.Data.Repositories;
 using Treinamento.Data.Services;
-using Treinamento.Domain;
 using Treinamento.Domain.Interfaces;
+using Treinamento.Shared.Results;
 
 namespace Treinamento.IoC;
 
@@ -46,7 +46,7 @@ public class NativeInjectorBootStrapper
 
         #region Services
 
-        services.AddScoped<IEnderecoService, EnderecoService>();
+        services.AddScoped<IEmpresaService, EmpresaService>();
 
         #endregion
 

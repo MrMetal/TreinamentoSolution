@@ -1,0 +1,54 @@
+﻿@page "/EmpresaDetail/{id:guid}"
+@using Treinamento.BlazorServerApp.Data.Endpoints.Empresas
+@using Treinamento.Shared.Results
+
+@inject ObterEmpresaPorIdEndpoint ObterEmpresaPorIdEndpoint
+
+<h3>EmpresaDetail</h3>
+
+<hr/>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">@Empresa.Nome</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Nome:</strong> @Empresa.Nome</p>
+        <p><strong>Razão Social:</strong> @Empresa.RazaoSocial</p>
+        <p><strong>CNPJ:</strong> @Empresa.Cnpj</p>
+        <p><strong>Contato:</strong> @(string.IsNullOrWhiteSpace(Empresa.Contato) ? "Não informado" : Empresa.Contato)</p>
+        <p><strong>Email:</strong> @(string.IsNullOrWhiteSpace(Empresa.Email) ? "Não informado" : Empresa.Email)</p>
+
+        @if (Empresa.Endereco is not null)
+        {
+            <p><strong>Endereço:</strong> @Empresa.Endereco.Logradouro, @Empresa.Endereco.Cidade - @Empresa.Endereco.Estado</p>
+        }
+
+        @if (Empresa.Setor.Any())
+        {
+            <p><strong>Setores:</strong></p>
+            <ul>
+                @foreach (var setor in Empresa.Setor)
+                {
+                    <li>@setor.Nome</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p><strong>Setores:</strong> Nenhum setor cadastrado</p>
+        }
+    </div>
+</div>
+
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private EmpresaResult Empresa { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Empresa = await ObterEmpresaPorIdEndpoint.ExecuteAsync(Id);
+    }
+}

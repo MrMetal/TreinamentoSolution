@@ -5,15 +5,13 @@ using Treinamento.Application.Interfaces;
 using Treinamento.Application.Validations;
 using Treinamento.Data.Identity;
 using Treinamento.Data.Identity.Jwt;
-using Treinamento.Data.Interfaces;
-using Treinamento.Domain;
 using Treinamento.Domain.Interfaces;
 using Treinamento.Shared.Enums;
+using Treinamento.Shared.Results;
 
 namespace Treinamento.Application.CQRS.Auth;
 
 public class AuthCommandHandler(INotificador notificador,
-    IUser appUser,
     SignInManager<ApplicationUser> signInManager,
     UserManager<ApplicationUser> userManager,
     IOptions<AppSettings> appSettings,
@@ -56,7 +54,7 @@ public class AuthCommandHandler(INotificador notificador,
 
     public async Task<ResultData> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        request.Email = request.Email.ToLower();
+        request.Email = request.Email!.ToLower();
         var user = await userManager.FindByEmailAsync(request.Email);
 
         if (user == null)
@@ -68,7 +66,7 @@ public class AuthCommandHandler(INotificador notificador,
         if (user.Bloqueado)
             return ErrorResult(["Usuario Bloqueado! Entre em contato com o suporte para mais informações."]);
 
-        var result = await signInManager.PasswordSignInAsync(request.Email, request.Password, false, true);
+        var result = await signInManager.PasswordSignInAsync(request.Email, request.Password!, false, true);
 
         if (result.IsLockedOut)
             return ErrorResult(["Usuário temporariamente bloqueado por tentativas inválidas"]);

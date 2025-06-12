@@ -1,0 +1,14 @@
+﻿@page "/401"
+
+<br />
+<h1>401</h1>
+<p>Desculpe, Você não está autorizado a acessar essa pagina.</p>
+<br />
+
+<button @onclick="GoToHome">
+    Voltar para a pagina inicial
+</button>
+
+@code {
+    private void GoToHome() => NavigationManager.NavigateTo("/");
+}

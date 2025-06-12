@@ -5,6 +5,7 @@ using Treinamento.Data.Repositories;
 using Treinamento.Domain;
 using Treinamento.Domain.Interfaces;
 using Treinamento.Domain.Models;
+using Treinamento.Shared.Results;
 
 namespace Treinamento.Application.CQRS.Empresas;
 
@@ -13,7 +14,7 @@ public class EmpresaCommandHandler(INotificador notificador,
     IEmpresaRepository empresaRepository, 
     IEnderecoRepository enderecoRepository,
     IUnitOfWork unitOfWork, 
-    IEnderecoService enderecoService) : 
+    IEmpresaService enderecoService) : 
     CommandQueryHandler(notificador),
     IRequestHandler<CreateEmpresaCommand, ResultData>,
     IRequestHandler<UpdateEmpresaCommand, ResultData>,

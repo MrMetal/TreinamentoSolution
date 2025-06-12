@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using Treinamento.Domain;
 using Treinamento.Domain.Interfaces;
 using Treinamento.Domain.ValueObjects;
+using Treinamento.Shared.Results;
 
 namespace Treinamento.Application.CQRS;
 

@@ -1,4 +1,5 @@
 ﻿using Treinamento.Domain;
+using Treinamento.Shared.Results;
 
 namespace Treinamento.Application.Interfaces;
 

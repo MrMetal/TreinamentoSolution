@@ -2,7 +2,7 @@
 
 namespace Treinamento.Shared.Results;
 
-public class EnderecoResult
+public class EnderecoResult : Entity
 {
     public EnderecoResult(Endereco? endereco)
     {

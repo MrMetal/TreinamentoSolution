@@ -6,7 +6,9 @@ using Treinamento.Shared.Results;
 
 namespace Treinamento.Application.CQRS.Empresas;
 
-public class EmpresaQueryHandler(INotificador notificador, IEmpresaRepository empresaRepository) : 
+public class EmpresaQueryHandler(INotificador notificador, 
+    IEmpresaRepository empresaRepository, 
+    IEmpresaService empresaService) : 
     CommandQueryHandler(notificador), 
     IRequestHandler<GetAllEmpresasQuery, ResultData>,
     IRequestHandler<GetEmpresaByIdQuery, ResultData>
@@ -14,23 +16,15 @@ public class EmpresaQueryHandler(INotificador notificador, IEmpresaRepository em
     public async Task<ResultData> Handle(GetAllEmpresasQuery request, CancellationToken cancellationToken)
     {
         var empresas = await empresaRepository.ObterTodos();
-        var result = empresas.Select(x => new EmpresaResult { Nome = x.Nome, RazaoSocial = x.RazaoSocial }).ToArray();
+        var result = empresas.Select(x => new EmpresaResult { Id = x.Id, Nome = x.Nome, RazaoSocial = x.RazaoSocial }).ToArray();
         
         return SuccessResult(result);
     }
 
     public async Task<ResultData> Handle(GetEmpresaByIdQuery request, CancellationToken cancellationToken)
     {
-        var empresa = await empresaRepository.ObterPorId(request.Id);
+        var empresa = await empresaService.GetEmpresaById(request.Id);
 
-        if (empresa is null) return ErrorResult(["Empresa não encontrada"]);
-
-        var result = new EmpresaResult
-        {
-            Nome = empresa.Nome,
-            RazaoSocial = empresa.RazaoSocial
-        };
-
-        return SuccessResult(result);
+        return empresa is null ? ErrorResult(["Empresa não encontrada"]) : SuccessResult(empresa);
     }
 }

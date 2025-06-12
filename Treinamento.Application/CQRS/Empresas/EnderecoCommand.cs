@@ -1,6 +1,7 @@
 ﻿using Treinamento.Application.Interfaces;
 using Treinamento.Domain;
 using Treinamento.Domain.Models;
+using Treinamento.Shared.Results;
 
 namespace Treinamento.Application.CQRS.Empresas;
 

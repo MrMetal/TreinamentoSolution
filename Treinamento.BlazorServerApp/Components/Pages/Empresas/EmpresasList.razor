@@ -1,0 +1,71 @@
+﻿@page "/EmpresasList"
+@using Treinamento.BlazorServerApp.Data.Endpoints.Empresas
+@using Treinamento.Shared.Results
+
+@inject ObterTodasEmpresasEndpoint ObterTodasEmpresasEndpoint
+
+<PageTitle>Empresas</PageTitle>
+
+<h1>Empresas</h1>
+
+@if (_empresas.Length == 0)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Razão Social</th>
+                <th>Opções</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in _empresas)
+            {
+                <tr>
+                    <td>@item.Nome</td>
+                    <td>@item.RazaoSocial</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => ViewItem(item.Id)">View</button>
+                        <button class="btn btn-warning" @onclick="() => EditItem(item.Id)">Edit</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteItem(item.Id)">Delete</button>
+                    </td>
+                </tr>
+
+            }
+
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private EmpresaResult[] _empresas = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(500); // Simulação de carregamento
+
+        _empresas = await ObterTodasEmpresasEndpoint.ExecuteAsync();
+    }
+
+    private void ViewItem(Guid id)
+    {
+        NavigationManager.NavigateTo($"/EmpresaDetail/{id}");
+    }
+
+    private static void EditItem(Guid id)
+    {
+        // lógica para editar o item
+    }
+
+    private static void DeleteItem(Guid id)
+    {
+        // lógica para deletar o item
+    }
+
+}

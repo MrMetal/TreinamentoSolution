@@ -5,6 +5,7 @@ using Treinamento.Application.Interfaces;
 using Treinamento.Data.Identity;
 using Treinamento.Domain;
 using Treinamento.Domain.Interfaces;
+using Treinamento.Shared.Results;
 
 namespace Treinamento.Api.Controllers
 {
@@ -13,7 +14,7 @@ namespace Treinamento.Api.Controllers
     public class EmpresasController(INotificador notificador, IMediator mediator) : MainController(notificador, mediator)
     {
         [HttpGet]
-        [CustomAuthorization.ClaimsAuthorize("Admin", "Read")]
+        [CustomAuthorization.ClaimsAuthorize("Admin,Comum", "Read")]
         public async Task<ResultData> GetAll()
             => await Mediator.Send(new GetAllEmpresasQuery());
 

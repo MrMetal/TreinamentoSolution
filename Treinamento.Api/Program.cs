@@ -8,6 +8,7 @@ using Treinamento.Data.Context;
 using Treinamento.Data.Identity;
 using Treinamento.Data.Identity.Jwt;
 using Treinamento.Domain;
+using Treinamento.Shared.Results;
 
 var builder = WebApplication.CreateBuilder(args);
 
