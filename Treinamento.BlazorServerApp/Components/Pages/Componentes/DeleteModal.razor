@@ -1,0 +1,40 @@
+﻿@typeparam TItem
+
+@if (Exibir)
+{
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Titulo</h5>
+                    <button type="button" class="btn-close" @onclick="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@Mensagem</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="Fechar">Cancelar</button>
+                    <button class="btn btn-danger" @onclick="Confirmar">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    [Parameter] public string Titulo { get; set; } = "Confirmar Ação";
+    [Parameter] public string Mensagem { get; set; } = "Deseja realmente realizar esta ação?";
+    [Parameter] public bool Exibir { get; set; }
+    [Parameter] public EventCallback<bool> OnConfirmar { get; set; }
+
+    private async Task Confirmar()
+    {
+        await OnConfirmar.InvokeAsync(true);
+    }
+
+    private async Task Fechar()
+    {
+        await OnConfirmar.InvokeAsync(false);
+    }
+}

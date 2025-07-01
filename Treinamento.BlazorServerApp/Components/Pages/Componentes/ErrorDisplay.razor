@@ -1,0 +1,41 @@
+﻿@using Treinamento.BlazorServerApp.Components.Layout
+@layout MainLayout
+
+@if (showModal)
+{
+    <ErrorModal Title="Erro"
+                Message="@mensagem"
+                OnClose="HandleClose" />
+}
+
+@code {
+    [Parameter] public required Exception Exception { get; set; }
+    [Parameter] public required ErrorBoundary ErrorBoundary { get; set; }
+
+    private bool showModal = false;
+    private string mensagem = "Desculpe, tivemos um problema e não foi possível carregar as informações.";
+    private static bool _isHandlingError = false;
+
+    protected override Task OnInitializedAsync()
+    {
+        if (_isHandlingError)
+            return Task.CompletedTask;
+
+        _isHandlingError = true;
+
+#if DEBUG
+        var mensagemDev = $"\n\n[DEBUG] {Exception?.Message}\n\n{Exception?.StackTrace}";
+        mensagem += mensagemDev;
+#endif
+
+        showModal = true;
+        return Task.CompletedTask;
+    }
+
+    private void HandleClose()
+    {
+        showModal = false;
+        ErrorBoundary.Recover();
+        _isHandlingError = false;
+    }
+}

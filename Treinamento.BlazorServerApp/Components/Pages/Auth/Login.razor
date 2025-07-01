@@ -43,7 +43,7 @@
     
     private async Task HandleValidSubmit()
     {
-        var result  = await ApiService.PostAsync("Auth/login", _loginModel);
+        var result  = await ApiService.PostAsync("Auth/login", _loginModel, true);
 
         if (result.Success)
         {

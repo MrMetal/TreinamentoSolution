@@ -1,6 +1,11 @@
 ﻿@page "/EmpresasList"
+@using Microsoft.AspNetCore.Authorization
 @using Treinamento.BlazorServerApp.Data.Endpoints.Empresas
 @using Treinamento.Shared.Results
+@using Treinamento.BlazorServerApp.Components.Pages.Componentes
+@using Treinamento.BlazorServerApp.Data
+
+@attribute [Authorize(Policy = AppPolicies.PermissaoRead)]
 
 @inject ObterTodasEmpresasEndpoint ObterTodasEmpresasEndpoint
 
@@ -14,9 +19,16 @@
 }
 else
 {
+    <DeleteModal TItem="EmpresaResult"
+                            Titulo="Confirmar Exclusão"
+                            Mensagem="Tem certeza que deseja excluir a empresa selecionada?"
+                            Exibir="@MostrarModal"
+                            OnConfirmar="OnConfirmacaoModal" />
+
     <table class="table">
         <thead>
             <tr>
+                <th>Id</th>
                 <th>Nome</th>
                 <th>Razão Social</th>
                 <th>Opções</th>
@@ -27,12 +39,13 @@ else
             @foreach (var item in _empresas)
             {
                 <tr>
+                    <td>@item.Id</td>
                     <td>@item.Nome</td>
                     <td>@item.RazaoSocial</td>
                     <td>
                         <button class="btn btn-primary" @onclick="() => ViewItem(item.Id)">View</button>
                         <button class="btn btn-warning" @onclick="() => EditItem(item.Id)">Edit</button>
-                        <button class="btn btn-danger" @onclick="() => DeleteItem(item.Id)">Delete</button>
+                        <button class="btn btn-danger" @onclick="() => PedirConfirmacao(item)">Delete</button>
                     </td>
                 </tr>
 
@@ -45,12 +58,19 @@ else
 @code {
 
     private EmpresaResult[] _empresas = [];
+    private bool MostrarModal;
+    private EmpresaResult? EmpresaSelecionada;
 
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(500); // Simulação de carregamento
-
         _empresas = await ObterTodasEmpresasEndpoint.ExecuteAsync();
+    }
+
+    private void PedirConfirmacao(EmpresaResult empresa)
+    {
+        EmpresaSelecionada = empresa;
+        MostrarModal = true;
     }
 
     private void ViewItem(Guid id)
@@ -63,9 +83,14 @@ else
         // lógica para editar o item
     }
 
-    private static void DeleteItem(Guid id)
+    private void OnConfirmacaoModal(bool confirmado)
     {
-        // lógica para deletar o item
-    }
+        if (confirmado && EmpresaSelecionada != null)
+        {
+            //Aqui chama o endpoint de delete
+        }
 
+        MostrarModal = false;
+        EmpresaSelecionada = null;
+    }
 }

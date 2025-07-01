@@ -15,7 +15,7 @@
                     </Authorizing>
 
                     <NotAuthorized>
-                        <NaoAutorizado/>
+                        @{ NavigationManager.NavigateTo(context.User.Identity?.IsAuthenticated == true ? "/401" : "/login", true); }
                     </NotAuthorized>
                 </AuthorizeRouteView>
             </CascadingValue>

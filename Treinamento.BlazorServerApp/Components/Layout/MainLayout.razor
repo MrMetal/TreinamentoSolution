@@ -1,4 +1,5 @@
 ﻿@using Treinamento.BlazorServerApp.Components.Pages.Auth
+@using Treinamento.BlazorServerApp.Components.Pages.Componentes
 @inherits LayoutComponentBase
 
 <AuthorizeView>
@@ -15,13 +16,22 @@
                 </div>
 
                 <article class="content px-4">
-                    @Body
+                    <ErrorBoundary @ref="_errorBoundary">
+                        <ChildContent>
+                            
+                            @Body
+
+                        </ChildContent>
+                        <ErrorContent Context="Exception">
+                            <ErrorDisplay Exception="@Exception" ErrorBoundary="_errorBoundary" />
+                        </ErrorContent>
+                    </ErrorBoundary>
                 </article>
             </main>
         </div>
     </Authorized>
     <NotAuthorized>
-        <Login/>
+        <Login />
     </NotAuthorized>
 </AuthorizeView>
 
@@ -30,3 +40,8 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code
+{
+    private ErrorBoundary _errorBoundary = new();
+}

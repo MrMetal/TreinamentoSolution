@@ -1,4 +1,8 @@
 ﻿@page "/weather"
+@using Microsoft.AspNetCore.Authorization
+@using Treinamento.BlazorServerApp.Data
+
+@attribute [Authorize(Policy = AppPolicies.SomenteAdmins)]
 
 <PageTitle>Weather</PageTitle>
 

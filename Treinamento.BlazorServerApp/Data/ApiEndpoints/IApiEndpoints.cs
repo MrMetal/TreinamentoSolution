@@ -10,23 +10,26 @@ namespace Treinamento.BlazorServerApp.Data.ApiEndpoints;
 
 public interface IApiEndpoints<T>
 {
-    Task<ResultData> PostAsync(string endpoint, T data);
+    Task<ResultData> PostAsync(string endpoint, T data, bool isLogin = false);
     Task<ResultData> PutAsync(string endpoint, Guid id, T data);
     Task<ResultData> DeleteAsync(string endpoint, Guid id);
-    Task<IEnumerable<T>> GetAllAsync(string endpoint);
+    Task<T[]> GetAllAsync(string endpoint);
     Task<T?> GetByIdAsync(Guid id, string endpoint);
 }
 
 public class ApiEndpoints<T>(NavigationManager navManager, IHttpClientFactory httpClientFactory, JwtTokenFactory jwtTokenFactory) : IApiEndpoints<T>
 {
-    public async Task<ResultData> PostAsync(string endpoint, T data)
+    public async Task<ResultData> PostAsync(string endpoint, T data, bool isLogin = false)
     {
         var uri = $"https://localhost:7061/api/{endpoint}";
 
         var httpClient = httpClientFactory.CreateClient();
-        var token = jwtTokenFactory.GenerateJwtFromCurrentUser();
 
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        if (isLogin == false)
+        {
+            var token = jwtTokenFactory.GenerateJwtFromCurrentUser();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
 
         var sendObject = JsonConvert.SerializeObject(data);
 
@@ -167,7 +170,7 @@ public class ApiEndpoints<T>(NavigationManager navManager, IHttpClientFactory ht
         };
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync(string endpoint)
+    public async Task<T[]> GetAllAsync(string endpoint)
     {
         var uri = $"https://localhost:7061/api/{endpoint}";
 

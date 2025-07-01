@@ -9,11 +9,16 @@ public class JwtTokenFactory(IConfiguration configuration, IHttpContextAccessor 
     public string GenerateJwtFromCurrentUser()
     {
         var user = httpContextAccessor.HttpContext?.User;
+        var context = httpContextAccessor.HttpContext;
 
-        if (user == null || !user.Identity?.IsAuthenticated == true)
-            throw new InvalidOperationException("Usuário não autenticado.");
+        if (context?.User == null || !context.User.Identity?.IsAuthenticated == true)
+        {
+            // Redireciona para a tela de login
+            context?.Response.Redirect("/login"); // ou a rota correta da sua aplicação
+            return string.Empty; // ou null, dependendo do seu fluxo
+        }
 
-        var claims = user.Claims;
+        var claims = user!.Claims;
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["AppSettings:Secret"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -25,6 +30,24 @@ public class JwtTokenFactory(IConfiguration configuration, IHttpContextAccessor 
             expires: DateTime.UtcNow.AddMinutes(60),
             signingCredentials: creds);
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var result = new JwtSecurityTokenHandler().WriteToken(token);
+
+        var isTokenValid = IsTokenStillValid(result);
+        return result;
+    }
+
+    private static bool IsTokenStillValid(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        try
+        {
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            return jwtToken.ValidTo > DateTime.UtcNow;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

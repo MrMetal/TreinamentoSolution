@@ -11,25 +11,33 @@ public class TokenSettings(UserManager<ApplicationUser> userManager)
 {
     public async Task<LoginResponseViewModel> GerarJwt(string email, AppSettings appSettings)
     {
-        var user = await userManager.FindByEmailAsync(email)
-                   ?? throw new Exception("Usuário não encontrado.");
+        var user = await userManager.FindByEmailAsync(email) ?? throw new Exception("Usuário não encontrado!");
+        var claims = await userManager.GetClaimsAsync(user);
+        var userRoles = await userManager.GetRolesAsync(user);
 
-        var claims = await ObterClaimsAsync(user);
+        //Claims do JWT
+        claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email!));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, ToUnixEpochDate(DateTime.UtcNow).ToString()));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64));
+
+        foreach (var userRole in userRoles) claims.Add(new Claim("role", userRole));
+
+        var identityClaims = new ClaimsIdentity();
+        identityClaims.AddClaims(claims);
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.Secret!));
-
-        var enumerable = claims as Claim[] ?? claims.ToArray();
-        var tokenDescriptor = new SecurityTokenDescriptor
+        var key = Encoding.ASCII.GetBytes(appSettings.Secret!);
+        var token = tokenHandler.CreateToken(new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(enumerable),
-            Expires = DateTime.UtcNow.AddHours(appSettings.ExpiracaoHoras),
             Issuer = appSettings.Emissor,
             Audience = appSettings.ValidoEm,
-            SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
-        };
+            Subject = identityClaims,
+            Expires = DateTime.UtcNow.AddHours(appSettings.ExpiracaoHoras),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        });
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
         var encodedToken = tokenHandler.WriteToken(token);
 
         return new LoginResponseViewModel
@@ -45,32 +53,11 @@ public class TokenSettings(UserManager<ApplicationUser> userManager)
                 TipoUsuario = user.Tipo,
                 Bloqueado = user.Bloqueado,
                 Ativo = user.Ativo,
-                Claims = enumerable.Select(c => new ClaimViewModel { Type = c.Type, Value = c.Value }).ToList()
+                Claims = claims.Select(c => new ClaimViewModel { Type = c.Type, Value = c.Value }).ToList()
             }
         };
     }
 
-    private async Task<IEnumerable<Claim>> ObterClaimsAsync(ApplicationUser user)
-    {
-        var claims = await userManager.GetClaimsAsync(user);
-        var roles = await userManager.GetRolesAsync(user);
-
-        var jwtClaims = new List<Claim>
-        {
-            new(JwtRegisteredClaimNames.Sub, user.Id),
-            new(JwtRegisteredClaimNames.Email, user.Email!),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.Nbf, ToUnixEpochDate(DateTime.UtcNow).ToString()),
-            new(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64)
-        };
-
-        jwtClaims.AddRange(claims);
-        jwtClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-        return jwtClaims;
-    }
-
     private static long ToUnixEpochDate(DateTime date)
         => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);
-
 }

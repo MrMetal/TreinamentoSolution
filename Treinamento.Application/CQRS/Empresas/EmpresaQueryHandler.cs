@@ -16,7 +16,10 @@ public class EmpresaQueryHandler(INotificador notificador,
     public async Task<ResultData> Handle(GetAllEmpresasQuery request, CancellationToken cancellationToken)
     {
         var empresas = await empresaRepository.ObterTodos();
-        var result = empresas.Select(x => new EmpresaResult { Id = x.Id, Nome = x.Nome, RazaoSocial = x.RazaoSocial }).ToArray();
+
+        var result = empresas
+            .Select(x => new EmpresaResult { Id = x.Id, Nome = x.Nome, RazaoSocial = x.RazaoSocial })
+            .ToArray();
         
         return SuccessResult(result);
     }
