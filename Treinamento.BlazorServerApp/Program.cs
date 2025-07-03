@@ -52,7 +52,6 @@ builder.Services.AddScoped<ObterEmpresaPorIdEndpoint>();
 builder.Services.AddSingleton<JwtTokenFactory>();
 builder.Services.AddSingleton<IAuthorizationHandler, PermissaoHandler>();
 
-
 builder.Services.AddHttpClient(); // necessário para IHttpClientFactory
 builder.Services.AddHttpContextAccessor();
 

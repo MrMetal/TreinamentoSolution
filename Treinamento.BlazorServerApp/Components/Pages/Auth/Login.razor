@@ -50,7 +50,7 @@
             var tokenResponse = JsonConvert.DeserializeObject<LoginResponseViewModel>(result.Data!.ToString()!);
             await LocalStorageService.SetItemAsync("est.token", tokenResponse!.AccessToken);
         
-            NavigationManager.NavigateTo($"/Auth/SignIn?token={Uri.EscapeDataString(tokenResponse!.AccessToken)}", true);
+            NavigationManager.NavigateTo($"/Auth/SignIn?token={Uri.EscapeDataString(tokenResponse.AccessToken)}", true);
 
             StateHasChanged();
         }

@@ -7,6 +7,7 @@ public class ObterTodasEmpresasEndpoint(IApiEndpoints<EmpresaResult> apiEndpoint
 {
     public async Task<EmpresaResult[]> ExecuteAsync()
     {
-        return await apiEndpoints.GetAllAsync("empresas");
+        var result = await apiEndpoints.GetAllAsync("empresas");
+        return result;
     }
 }

@@ -2,44 +2,71 @@
 @using Microsoft.AspNetCore.Authorization
 @using Treinamento.BlazorServerApp.Data
 
-@attribute [Authorize(Policy = AppPolicies.SomenteAdmins)]
+@attribute [Authorize]
 
 <PageTitle>Weather</PageTitle>
 
 <h1>Weather</h1>
-
-<p>This component demonstrates showing data.</p>
+<p>Este componente mostra dados com virtualização eficiente.</p>
 
 @if (forecasts == null)
 {
-    <p><em>Loading...</em></p>
+    <p><em>Carregando...</em></p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th aria-label="Temperature in Celsius">Temp. (C)</th>
-                <th aria-label="Temperature in Farenheit">Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="virtual-table">
+        <div class="virtual-header">
+            <div>Date</div>
+            <div>Temp. (C)</div>
+            <div>Temp. (F)</div>
+            <div>Summary</div>
+        </div>
 
-            <Virtualize ItemsProvider="LoadForecasts" OverscanCount="20" ItemSize="20" Context="item">
-                <tr>
-                    <td>@item.Date.ToShortDateString()</td>
-                    <td>@item.TemperatureC</td>
-                    <td>@item.TemperatureF</td>
-                    <td>@item.Summary</td>
-                </tr>
+        <div class="virtual-body">
+            <Virtualize ItemsProvider="LoadForecasts" ItemSize="30" Context="item">
+                <div class="virtual-row">
+                    <div>@item.Date.ToShortDateString()</div>
+                    <div>@item.TemperatureC</div>
+                    <div>@item.TemperatureF</div>
+                    <div>@item.Summary</div>
+                </div>
             </Virtualize>
-
-
-        </tbody>
-    </table>
+        </div>
+    </div>
 }
+
+<style>
+    .virtual-table {
+        width: 100%;
+        font-family: sans-serif;
+    }
+
+    .virtual-header, .virtual-row {
+        display: flex;
+        border-bottom: 1px solid #ccc;
+        padding: 8px 0;
+    }
+
+    .virtual-header {
+        font-weight: bold;
+        background-color: #f0f0f0;
+    }
+
+        .virtual-row > div, .virtual-header > div {
+            flex: 1;
+            padding: 0 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+    .virtual-body {
+        height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+    }
+</style>
 
 @code {
     private WeatherForecast[]? forecasts;
@@ -50,7 +77,8 @@ else
 
         var startDate = DateOnly.FromDateTime(DateTime.Now);
         var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 50).Select(index => new WeatherForecast
+
+        forecasts = Enumerable.Range(1, 90).Select(index => new WeatherForecast
         {
             Date = startDate.AddDays(index),
             TemperatureC = Random.Shared.Next(-20, 55),
@@ -67,8 +95,7 @@ else
 
         var requestedItems = forecasts.Skip(request.StartIndex).Take(request.Count).ToArray();
 
-        // Simular atraso opcional para testar carregamento
-        await Task.Delay(100);
+        await Task.Delay(100); // Simula carregamento
 
         return new ItemsProviderResult<WeatherForecast>(requestedItems, forecasts.Length);
     }
